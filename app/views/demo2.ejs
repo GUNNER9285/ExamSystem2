@@ -7,6 +7,16 @@
 
 <div class="container">
     <br>
+
+    <h1><%= title %></h1>
+    <% if (isLoggedIn) { %>
+    <h2>You are logged in.</h2>
+    <form class="form-group" method="POST" action="/logout">
+        <button type="submit" class="btn btn-primary">
+            Logout
+        </button>
+    </form>
+    <% } else{ %>
     <div class="jumbotron">
         <h3 class="display-4">Login</h3>
         <form class="form-group" method="POST" action="/login">
@@ -39,6 +49,7 @@
             </div>
         </div>
     </div>
+    <% } %>
 </div>
 
 <% include ./layouts/body %>
