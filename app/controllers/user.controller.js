@@ -1,66 +1,83 @@
 var User = require('mongoose').model('User');
 
-exports.login = function (req, res) {
-    console.log(req.body);
-
-    req.checkBody('username', 'Invalid Username').notEmpty();
-    req.checkBody('password', 'Invalid Password').notEmpty();
-
-    var errors = req.validationErrors();
-    if(errors){
-        res.render('index', {
-            //'title': JSON.stringify(errors),
-            'title': 'Invalid Username" or Password',
-            'isLoggedIn': false
-        });
-        return;
+var getErrorMessage = function(err){
+    var message = '';
+    if(err.code){ // Index Error คือ
+        switch (err.code) {
+            case 11000:
+            case 11001:
+                message = 'Username already exists'; // Username ซ้ำ
+                break;
+            default:
+                message = 'Something went wrong'; // มีบางอย่างผิดพลาด
+        }
     }
+    else{ // Validation Error
+        for (var errName in err.errors){
+            if(err.errors[errName].message){
+                message = err.errors[errName].message;
+            }
+        }
+    }
+    return message;
+}
 
-    req.session.remember = true;
-    req.session.username = req.body.username;
-    req.session.cookie.maxAge = 6000;
-
-    res.render('index', {
-        'title': 'Logged in as '+req.body.username,
-        'isLoggedIn': true
-    });
+exports.renderLogin = function (req, res) {
+    if(!req.user) {
+        res.render('index', {
+            title: 'Index',
+            errors: req.flash('error')
+        });
+    }
+    else{
+        return res.redirect('/exam');
+    }
 };
 
-exports.logout = function (req, res) {
-    req.session = null;
-    res.render('index', {
-        'title': 'See ya ~',
-        'isLoggedIn': false
-    });
+exports.renderRegister = function (req, res, next) {
+    if(!req.user) {
+        res.render('register', {
+            'title': 'Register',
+            'errors': req.flash('error')
+        });
+    }
+    else{
+        return res.redirect('/exam');
+    }
 };
 
 exports.register = function (req, res, next) {
-    if(typeof req.session.remember != 'undefined'){
-        isLoggedIn = req.session.remember;
-        res.render('exam', {
-            'title': 'Exam'
+    if(!req.user){
+        var user = new User(req.body);
+        user.provider = 'local';
+
+        user.save(function (err) {
+            if(err){
+                var message = getErrorMessage(err); // err จาก mongoose
+                req.flash('error', message);
+
+                return res.redirect('/register');
+            }
+            req.login(user, function (err) {
+                if(err){
+                    return next(err);
+                }
+                return res.redirect('/exam');
+            });
         });
     }
-    res.render('register', {
-        'title': 'Register'
-    });
+    else{
+        return res.redirect('/exam');
+    }
 };
 
-exports.create = function (req, res, next) {
-    var user = new User(req.body);
-
-    user.save(function (err) {
-        if(err){
-            return next(err);
-        }
-        else{
-            res.redirect('/');
-        }
-    });
+exports.logout = function (req, res) {
+    req.logout();
+    res.redirect('/');
 };
 
 exports.read = function (req, res, next) {
-    User.find({}, 'username', function(err, users){
+    User.find({}, function(err, users){
         if(err){
             return next(err);
         }

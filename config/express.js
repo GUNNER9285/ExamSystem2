@@ -1,10 +1,13 @@
+var config = require('./config');
+
 var express = require('express'),
     morgan = require('morgan'),
     compression = require('compression'),
     bodyParser = require('body-parser'),
     validtor = require('express-validator'),
     session = require('express-session'),
-    config = require('./config');
+    flash = require('connect-flash'),
+    passport = require('passport');
 
 module.exports = function () {
     var app = express();
@@ -20,6 +23,10 @@ module.exports = function () {
         resave: false,
         saveUninitialized: true
     }));
+    app.use(flash());
+    app.use(passport.initialize()); // เริ่มการทำงานของ Passport
+    app.use(passport.session()); // ใช้ session โดยอาศัย express-session
+
     app.use(bodyParser.urlencoded({
         extended: true
     }));
@@ -29,8 +36,8 @@ module.exports = function () {
     app.set('views', './app/views');
     app.set('view engine', 'ejs');
 
-    require('../app/routes/index.routes')(app);
     require('../app/routes/user.routes')(app);
+    require('../app/routes/exam.routes')(app);
 
     app.use(express.static('./public'));
     return app;
