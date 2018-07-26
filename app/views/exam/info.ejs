@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../layouts/head %>
+</head>
+<body>
+<% include ../layouts/header %>
+
+
+<div class="container">
+    <br/>
+    <div class="card">
+        <div class="card-header">
+            <h5>ข้อที่ <%= exam.number %> &nbsp; <%= exam.score %> คะแนน</h5>
+        </div>
+        <div class="card-body">
+            <h5>คำถาม <%= exam.question %></h5>
+            <form action="/exam/send/<%= exam.number %>" method="POST">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="answer" placeholder="คำตอบ" required="true">
+                    <small id="emailHelp" class="form-text text-muted">กรุณาพิมพ์ตัวใหญ่ ตัวเล็ก ให้ถูกต้อง</small>
+                </div>
+                <button type="submit" class="btn btn-success">ส่งคำตอบ</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<% include ../layouts/body %>
+</body>
+</html>

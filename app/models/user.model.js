@@ -16,7 +16,7 @@ var UserSchema = new Schema({
             function (password) {
                 return password && password.length == 8;
             },
-            'Password must be at least 6 characters'
+            'Password must be at equal 8 characters'
         ],
     },
     salt: { // เใช้เพื่อนำไปทำ password hash
@@ -31,6 +31,9 @@ var UserSchema = new Schema({
     },
     providerData: { // เก็บข้อมูลจาก OAuth provider
 
+    },
+    score: {
+        type: [Number],
     },
     created:{
         type: Date,

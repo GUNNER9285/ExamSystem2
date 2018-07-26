@@ -50,7 +50,7 @@ exports.register = function (req, res, next) {
     if(!req.user){
         var user = new User(req.body);
         user.provider = 'local';
-
+        user.score = [0, 0, 0, 0, 0, 0];
         user.save(function (err) {
             if(err){
                 var message = getErrorMessage(err); // err จาก mongoose
@@ -126,6 +126,20 @@ exports.deleteOne = function (req, res, next) {
         }
         else{
             res.json(req.user);
+        }
+    });
+};
+
+exports.showScore = function (req, res, next) {
+    User.find({}).sort({score: 'asc'}).exec(function(err, users){
+        if(err){
+            return next(err);
+        }
+        else{
+            res.render('score', {
+                title: 'Score',
+                users: users
+            });
         }
     });
 };

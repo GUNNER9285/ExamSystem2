@@ -14,6 +14,9 @@ module.exports = function (app) {
         .post(user.register);
     app.post('/logout', user.logout);
 
+    app.route('/show/score')
+        .get(user.showScore);
+
     app.get('/read', user.read);
     app.get('/read/:username', user.readOne);
 
