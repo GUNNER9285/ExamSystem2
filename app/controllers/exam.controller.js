@@ -31,6 +31,7 @@ exports.info = function(req, res){
             user: req.user ? req.user : '',
             score: score,
             exam: req.exam,
+            error: false
         });
     }
     else{
@@ -57,17 +58,20 @@ exports.send = function (req, res){
     var answer = req.body.answer;
     if(exam.answer == answer){
         var scores = [];
+        var total = 0;
         for(var i=0; i<6; ++i){
             if(req.user.score[i] == 0 && i == req.exam.number - 1){
                 scores[i] = req.exam.score;
+                total += req.exam.score;
             }
             else {
                 scores[i] = req.user.score[i];
+                total += req.user.score[i];
             }
         }
         User.findOneAndUpdate({
             username: req.user.username
-        }, {score: scores}, function (err, user) {
+        }, {score: scores, total: total}, function (err, user) {
             if(err){
                 return next(err);
             }
@@ -77,7 +81,14 @@ exports.send = function (req, res){
         });
     }
     else{
-        return res.redirect('/exam/'+req.exam.number);
+        var score = findScore(req);
+        res.render('./exam/info', {
+            title: 'Exam',
+            user: req.user ? req.user : '',
+            score: score,
+            exam: exam,
+            error: true
+        });
     }
 
 };

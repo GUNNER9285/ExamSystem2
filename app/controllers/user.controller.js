@@ -131,7 +131,7 @@ exports.deleteOne = function (req, res, next) {
 };
 
 exports.showScore = function (req, res, next) {
-    User.find({}).sort({score: 'asc'}).exec(function(err, users){
+    User.find({}).sort({total: 'desc'}).exec(function(err, users){
         if(err){
             return next(err);
         }

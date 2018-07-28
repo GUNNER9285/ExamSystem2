@@ -35,6 +35,10 @@ var UserSchema = new Schema({
     score: {
         type: [Number],
     },
+    total: {
+        type: Number,
+        default: 0,
+    },
     created:{
         type: Date,
         default: Date.now
